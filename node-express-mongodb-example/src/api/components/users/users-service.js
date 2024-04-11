@@ -1,5 +1,6 @@
 const usersRepository = require('./users-repository');
-const { hashPassword } = require('../../../utils/password');
+const { hashPassword, passwordMatched } = require('../../../utils/password');
+const { EMAIL_ALREADY_TAKEN } = require('../../../core/errors');
 
 /**
  * Get list of users
@@ -49,6 +50,12 @@ async function getUser(id) {
  * @returns {boolean}
  */
 async function createUser(name, email, password) {
+  // Verify email
+  const emailTaken = await isEmailTaken(email);
+  if (emailTaken) {
+    throw EMAIL_ALREADY_TAKEN;
+  }
+
   // Hash password
   const hashedPassword = await hashPassword(password);
 
@@ -74,6 +81,12 @@ async function updateUser(id, name, email) {
   // User not found
   if (!user) {
     return null;
+  }
+
+  // Verify email
+  const emailTaken = await isEmailTaken(email);
+  if (emailTaken && user.email !== email) {
+    throw EMAIL_ALREADY_TAKEN;
   }
 
   try {
@@ -107,10 +120,39 @@ async function deleteUser(id) {
   return true;
 }
 
+async function isEmailTaken(email) {
+  return usersRepository.isEmailTaken(email);
+}
+
+async function changePasswordSchema(
+  id,
+  oldPassword,
+  newPassword,
+  password_confirm
+) {
+  if (password_confirm != newPassword) {
+    throw new Error('Invalid New Password');
+  }
+  const getUserId = await usersRepository.getUser(id);
+  const comparePassword = await passwordMatched(
+    oldPassword,
+    getUserId.password
+  );
+
+  if (!comparePassword) {
+    throw new Error('Wrong Password');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+  await usersRepository.getPassword(id, hashedPassword);
+}
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  isEmailTaken,
+  changePasswordSchema,
 };
