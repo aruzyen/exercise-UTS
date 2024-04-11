@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "BRUNO-P6-ExerciseAPI",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
