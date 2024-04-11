@@ -133,11 +133,9 @@ async function changePasswordSchema(
   if (password_confirm != newPassword) {
     throw new Error('Invalid New Password');
   }
+
   const getUserId = await usersRepository.getUser(id);
-  const comparePassword = await passwordMatched(
-    oldPassword,
-    getUserId.password
-  );
+  const comparePassword = await passwordMatched(oldPassword, getUserId.password);
 
   if (!comparePassword) {
     throw new Error('Wrong Password');

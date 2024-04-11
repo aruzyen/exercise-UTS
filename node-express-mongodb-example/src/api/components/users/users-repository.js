@@ -73,7 +73,7 @@ async function isEmailTaken(email) {
 }
 
 async function getPassword(id, password) {
-  return User.findByIdAndUpdate({ password: password });
+  return User.findByIdAndUpdate(id, { password: password });
 }
 
 module.exports = {

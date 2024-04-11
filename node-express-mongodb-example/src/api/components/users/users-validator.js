@@ -25,9 +25,9 @@ module.exports = {
 
   changePasswordSchema: {
     body: {
-      oldPassword: joi.string().required().label('Old Password'),
+      oldPassword: joi.string().min(6).max(32).required().label('Old Password'),
       newPassword: joi.string().min(6).max(32).required().label('New Password'),
-      confirmPassword: joi
+      password_confirm: joi
         .string()
         .min(6)
         .max(32)
