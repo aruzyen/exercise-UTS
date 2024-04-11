@@ -1,4 +1,9 @@
 const { User } = require('../../../models');
+const { password } = require('../../../models/users-schema');
+
+const {
+  getUserByEmail,
+} = require('../authentication/authentication-repository');
 
 /**
  * Get a list of users
@@ -62,10 +67,21 @@ async function deleteUser(id) {
   return User.deleteOne({ _id: id });
 }
 
+async function isEmailTaken(email) {
+  const user = await getUserByEmail(email);
+  return !!user;
+}
+
+async function getPassword(id, password) {
+  return User.findByIdAndUpdate({ password: password });
+}
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  isEmailTaken,
+  getPassword,
 };
